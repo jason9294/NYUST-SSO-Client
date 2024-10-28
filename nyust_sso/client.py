@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from ._types import CourseInfo, CourseInfoSchedule, PeriodTime
-from .errors import CaptchaError
+from .errors import *
 from .utils import get_period_time
 
 LOGIN_URL = "https://webapp.yuntech.edu.tw/YunTechSSO/Account/Login"  # SSO 登入 API URL
@@ -20,7 +20,7 @@ class NYUSTSSOClient:
         # 是否登入過 WebNewCAS
         self.__login_WebNewCAS = False
 
-    def __get_login_data(self) -> str:
+    def __get_login_data(self, username: str, password: str, captcha: str) -> dict:
         response = self.session.get(LOGIN_URL)
         soup = BeautifulSoup(response.text, 'html.parser')
         return {
@@ -32,6 +32,10 @@ class NYUSTSSOClient:
             "auth_ts": None,
             "auth_nonce": None,
             "auth_version": None,
+            "pRememberMe": False,
+            "pLoginName": username,
+            "pLoginPassword": password,
+            "pSecretString": captcha
         }
 
     def __handle_miraculous_redirect(self, url: str) -> str:
@@ -50,27 +54,23 @@ class NYUSTSSOClient:
         """ 登入 NYUST SSO & TronClass """
 
         # prepare login data
-        login_data = self.__get_login_data()
-        login_data.update({
-            "pRememberMe": False,
-            "pLoginName": username,
-            "pLoginPassword": password,
-            "pSecretString": captcha
-        })
+        login_data = self.__get_login_data(username, password, captcha)
 
         # login request
-        r = self.session.post(LOGIN_URL, data=login_data)
+        login_resp = self.session.post(LOGIN_URL, data=login_data)
+        with open("login.html", "w", encoding="utf8") as f:
+            f.write(login_resp.text)
 
-        # check if captcha is correct
-        if "Invalid validation code" in r.text:  # 偉哉 Yuntech sso 驗證碼錯誤時回傳 200
-            raise CaptchaError()
+        # 錯誤驗證 - 偉哉 Yuntech sso 錯誤時回傳 200
+        if "Account not exist or registered" in login_resp.text:
+            raise AccountNotRegisteredError()  # 帳號不存在或未註冊
+
+        if "Invalid validation code" in login_resp.text:
+            raise CaptchaError()  # 驗證碼錯誤
 
         # 偉哉 Yuntech sso 重定向不用 302
-        # 請求使用 sso 登入 eclass -> 重定向到 sso 登入頁面
-        # 獲取 sso 頁面中的重定向 URL -> 重定向到 eclass
-        r = self.session.get(ECLASS_LOGIN_URL)
-        soup = BeautifulSoup(r.text, 'html.parser')
-        redirect_url = soup.find('a').get('href')
+        # 登入 eclass -> 重定向到 sso -> 重定向到 eclass
+        redirect_url = self.__handle_miraculous_redirect(ECLASS_LOGIN_URL)
         self.session.get(redirect_url)
 
     def fetch_announcements(self) -> dict:

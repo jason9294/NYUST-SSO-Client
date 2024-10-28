@@ -12,3 +12,11 @@ class AccessDenyError(Exception):
     def __init__(self, message="Access denied"):
         self.message = message
         super().__init__(self.message)
+
+
+class AccountNotRegisteredError(Exception):
+    """Exception raised for errors in the account existence or registration status."""
+
+    def __init__(self, message="Account not exist or registered."):
+        self.message = message
+        super().__init__(self.message)
