@@ -5,10 +5,15 @@ NYUST 單一登入系統 (SSO) 模擬客戶端登入，並取得相關資訊。
 ## 安裝
 
 ```bash
-pip install ddddocr
+pip install nyust-sso-client
 ```
 
 ## 使用範例
+
+以下示範使用 ddddocr 處理驗證碼。執行以下指令安裝ddddocr(可選)。
+```bash
+pip install ddddocr
+```
 
 ```python
 import ddddocr
