@@ -1,4 +1,4 @@
-# NYUST SSO Client
+# NYUST SSO Client 0.1.0
 
 NYUST 單一登入系統 (SSO) 模擬客戶端登入，並取得相關資訊。
 

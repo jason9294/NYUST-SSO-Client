@@ -1,3 +1,6 @@
 test.py
 .ipynb
 __pycache__
+build
+dist
+*.egg-info
