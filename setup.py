@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="nyust-sso-client",
-    version="0.1.0",
+    version="0.1.1",
     description="A client for NYUST SSO system, providing authenticated access and common API calls.",
     long_description=open("README.md", encoding="utf8").read(),
     long_description_content_type="text/markdown",
@@ -21,5 +21,5 @@ setup(
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
-    python_requires='>=3.12',
+    python_requires='>=3.10',
 )

@@ -8,5 +8,6 @@
     "**/Thumbs.db": true,
     "**/__pycache__": true
   },
-  "explorerExclude.backup": {}
+  "explorerExclude.backup": {},
+  "workbench.activityBar.orientation": "vertical"
 }
