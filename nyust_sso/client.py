@@ -1,11 +1,13 @@
 import base64
 import re
+from typing import Optional
 
 import requests
 from bs4 import BeautifulSoup
 
 from ._types import CourseInfo, CourseInfoSchedule, PeriodTime
 from .errors import *
+from .tronclass import TronClassClient
 from .utils import get_period_time
 
 LOGIN_URL = "https://webapp.yuntech.edu.tw/YunTechSSO/Account/Login"  # SSO 登入 API URL
@@ -58,8 +60,8 @@ class NYUSTSSOClient:
 
         # login request
         login_resp = self.session.post(LOGIN_URL, data=login_data)
-        with open("login.html", "w", encoding="utf8") as f:
-            f.write(login_resp.text)
+        # with open("login.html", "w", encoding="utf8") as f:
+        #     f.write(login_resp.text)
 
         # 錯誤驗證 - 偉哉 Yuntech sso 錯誤時回傳 200
         if "Account not exist or registered" in login_resp.text:
@@ -72,6 +74,9 @@ class NYUSTSSOClient:
         # 登入 eclass -> 重定向到 sso -> 重定向到 eclass
         redirect_url = self.__handle_miraculous_redirect(ECLASS_LOGIN_URL)
         self.session.get(redirect_url)
+
+    def get_tronclass_client(self):
+        return TronClassClient(self.session)
 
     def fetch_announcements(self) -> dict:
         """ 獲取公告(?) (這個好像會是空的) """
@@ -109,7 +114,7 @@ class NYUSTSSOClient:
         response = self.session.get(f'https://eclass.yuntech.edu.tw/api/course/{course_id}/enrollments')
         return response.json()
 
-    def fetch_my_courses(self, year: int = None, semester: int = None) -> list[CourseInfo]:
+    def fetch_my_courses(self, year: Optional[int] = None, semester: Optional[int] = None) -> list[CourseInfo]:
         if semester not in [None, 1, 2]:  # 1: 上學期, 2: 下學期
             raise ValueError("semester should be 1 or 2")
 
