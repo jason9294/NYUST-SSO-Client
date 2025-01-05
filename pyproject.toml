@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nyust-sso-client"
-version = "0.2.0"
+version = "0.3.0"
 description = "A client for NYUST SSO system, providing authenticated access and common API calls."
 authors = ["jason9294 <jason9294@gmail.com>"]
 license = "MIT"

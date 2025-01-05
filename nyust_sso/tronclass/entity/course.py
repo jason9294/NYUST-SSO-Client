@@ -35,3 +35,7 @@ class Course(BaseResourceModel):
         data = response.json()['activities']
 
         return [Activity(session=self._session, course=self, **d) for d in data]
+
+    def fetch_completeness(self) -> dict:
+        response = self._session.get(f"https://eclass.yuntech.edu.tw/api/course/{self.id}/my-completeness")
+        return response.json()
