@@ -7,8 +7,20 @@ import requests
 from bs4 import BeautifulSoup
 from colorlog import ColoredFormatter
 
+from ..http import HttpClient, Route
 from .entity.activity import Activity
 from .entity.course import Course
+
+
+class TronClassAPIClient(HttpClient):
+    def __init__(self, base_url: str = "https://eclass.yuntech.edu.tw", session: requests.Session = None) -> None:
+        super().__init__(base_url=base_url, session=session)
+
+    def fetch_courses(self) -> list[Course]:
+        route = Route("GET", "/api/my-courses?page_size=1000")
+        response = self.request(route)
+        data = response.json()['courses']
+        return [Course(session=self.session, **d) for d in data]
 
 
 class TronClassClient:
